@@ -99,6 +99,54 @@ app.get('/news', (req, res) => {
     res.json(articles)
 })
 
+app.get('/weather/:city', async (req, res) => {
+
+    try {
+        const city = req.params.city
+        const url = "https://www.google.com/search?q=weather+" + city;
+    
+        const response = await axios.get(url);
+        const html = response.data;
+        const $ = cheerio.load(html);
+    
+        const temp = $('.BNeawe.iBp4i.AP7Wnd').text();
+        const str = $('.BNeawe.tAd8D.AP7Wnd').text();
+        const data = str.split('\n');
+        const time = data[0];
+        const sky = data[1];
+    
+        const listDiv = $('.BNeawe.s3v9rd.AP7Wnd');
+        const strd = $(listDiv[5]).text();
+        const pos = strd.indexOf('Wind');
+        const otherData = strd.substring(pos);
+    
+        const result = {
+          temperature: temp,
+          time: time,
+          skyDescription: sky,
+          otherData: otherData
+        };
+    
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: 'An error occurred' });
+      }
+
+    // const url = "https://www.google.com/search?q="+"weather"+cityName
+    // const html = axios.get(url).then(result =>{
+    //     const htmlData = result.data
+    //     const $ = cheerio.load(htmlData)
+
+        
+    //     $('a:contains("weather")', html).each(function () {
+    //         const title = $(this).text()
+    //         const url = $(this).attr('BNeawe s3v9rd AP7Wnd')
+
+    //     })
+    // })
+    
+})
+
 app.get('/news/:newspaperId', (req, res) => {
     const newspaperId = req.params.newspaperId
 
